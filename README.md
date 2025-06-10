@@ -1,5 +1,5 @@
-# CSV-cleaner
-#Simple python script that cleans a CSV file by removing empty and duplicate rows
+    # CSV-cleaner
+    # Simple python script that cleans a CSV file by removing empty and duplicate rows
 import csv
 
 def clean_csv(input_file, output_file):
