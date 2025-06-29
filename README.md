@@ -1,45 +1,60 @@
 import csv
 
-def clean_csv(input_file, output_file):
-    try:
-        with open(input_file, mode='r', newline='', encoding='utf-8') as infile:
-            reader = csv.reader(infile)
-            rows = list(reader)
+def clean_csv_file(input_file, output_file=None, remove_duplicates=True, drop_empty_rows=True):
+    """
+    Cleans a CSV file by:
+    - Stripping whitespace from headers and values
+    - Converting headers to UPPERCASE and replacing spaces with underscores
+    - Optionally removing duplicate rows
+    - Optionally dropping rows with empty fields
+    Saves the cleaned CSV to the specified output file.
+    If output filename is not provided, it will be generated automatically.
+    """
+    # Generate output filename if not provided
+    if output_file is None:
+        if input_file.lower().endswith('.csv'):
+            output_file = 'cleaned_' + input_file[:-4] + '.csv'
+        else:
+            output_file = 'cleaned_' + input_file + '.csv'
+    
+    cleaned_rows = []
+    seen_rows = set()
 
-  cleaned_rows = []
-  seen = set()
-  removed_count = 0
+    with open(input_file, mode='r', newline='', encoding='utf-8') as infile:
+        reader = csv.reader(infile)
+        rows = list(reader)
 
-  for row in rows:
-       # Skip empty rows (all fields empty or whitespace)
-    if not any(cell.strip() for cell in row):
-          removed_count += 1
-                continue
+    if not rows:
+        print("The CSV file is empty.")
+        return
 
-            # Remove duplicates
-  row_tuple = tuple(cell.strip() for cell in row)  
-  # strip to avoid whitespace duplicates
-  if row_tuple not in seen:
-            seen.add(row_tuple)
-            cleaned_rows.append(row)
-  else:
-            removed_count += 1
+    # Clean header: UPPERCASE and replace spaces with underscores
+    raw_header = rows[0]
+    header = [col.strip().upper().replace(' ', '_') for col in raw_header]
 
-        # Write cleaned data to output file
-  with open(output_file, mode='w', newline='', encoding='utf-8') as outfile:
-            writer = csv.writer(outfile)
-            writer.writerows(cleaned_rows)
+    for row in rows[1:]:
+        cleaned_row = [cell.strip() for cell in row]
 
-  print(f"Cleaning complete. {removed_count} rows removed.")
-        print(f"Cleaned file saved as '{output_file}'.")
+        # Skip rows with empty values or mismatched length
+        if drop_empty_rows and ('' in cleaned_row or len(cleaned_row) != len(header)):
+            continue
 
-  except FileNotFoundError:
-        print(f"Error: File '{input_file}' not found.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
+        row_tuple = tuple(cleaned_row)
+        if remove_duplicates and row_tuple in seen_rows:
+            continue
 
-# Example usage
+        seen_rows.add(row_tuple)
+        cleaned_rows.append(cleaned_row)
+
+    with open(output_file, mode='w', newline='', encoding='utf-8') as outfile:
+        writer = csv.writer(outfile)
+        writer.writerow(header)
+        writer.writerows(cleaned_rows)
+
+    print(f"Cleaned CSV written to: {output_file}")
+
 if __name__ == "__main__":
-    input_csv = input("Enter the input file")
-    output_csv = input("Enter the ouput file: ")
-    clean_csv(input_csv, output_csv)
+    input_csv = input("Enter the path of the CSV file to clean: ").strip()
+    output_csv = input("Enter the desired output file path (press Enter to use default): ").strip()
+    output_csv = output_csv if output_csv else None
+    clean_csv_file(input_csv, output_csv)
