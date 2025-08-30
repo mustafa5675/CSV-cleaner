@@ -1,54 +1,22 @@
-import csv
+# CSV Cleaner
 
-def clean_csv_file(input_file, output_file=None, remove_duplicates=True, drop_empty_rows=True):
-    """
-    Cleans a CSV file by:
-    - Stripping whitespace from headers and values
-    - Converting headers to UPPERCASE and replacing spaces with underscores
-    - Optionally removing duplicate rows
-    - Optionally dropping rows with empty fields
-    Saves the cleaned CSV to the specified output file.
-    If output filename is not provided, it will be generated automatically.
-    """
-    # Generate output filename if not provided
-    if output_file is None:
-        if input_file.lower().endswith('.csv'):
-            output_file = 'cleaned_' + input_file[:-4] + '.csv'
-        else:
-            output_file = 'cleaned_' + input_file + '.csv'
-    cleaned_rows = []
-    seen_rows = set()
-    # Read input CSV
-    with open(input_file, mode='r', newline='', encoding='utf-8') as infile:
-        reader = csv.reader(infile)
-        rows = list(reader)
-    if not rows:
-        print("The CSV file is empty.")
-        return
-    # Clean header
-    raw_header = rows[0]
-    header = [col.strip().upper().replace(' ', '_') for col in raw_header]
-    # Process rows
-    for row in rows[1:]:
-        cleaned_row = [cell.strip() for cell in row]
-        # Skip rows with empty values or incorrect number of columns
-        if drop_empty_rows and ('' in cleaned_row or len(cleaned_row) != len(header)):
-            continue
-        # Remove duplicates
-        row_tuple = tuple(cleaned_row)
-        if remove_duplicates and row_tuple in seen_rows:
-            continue
-        seen_rows.add(row_tuple)
-        cleaned_rows.append(cleaned_row)
-    # Write cleaned CSV
-    with open(output_file, mode='w', newline='', encoding='utf-8') as outfile:
-        writer = csv.writer(outfile)
-        writer.writerow(header)
-        writer.writerows(cleaned_rows)
-    print(f"Cleaned CSV written to: {output_file}")
+A lightweight Python utility to quickly clean CSV files by removing **duplicate rows** and **blank rows**, then saving the cleaned data into a new CSV file.  
 
-if __name__ == "__main__":
-    input_csv = input("Enter the path of the CSV file to clean: ").strip()
-    output_csv = input("Enter the desired output file path (press Enter to use default): ").strip()
-    output_csv = output_csv if output_csv else None
-    clean_csv_file(input_csv, output_csv)
+## ✨ Features
+- Removes all **duplicate rows** from your CSV.  
+- Strips out any **blank/empty rows**.  
+- Saves the cleaned file separately so the original data stays intact.  
+- Fast and simple to use — works with any standard CSV file.  
+
+## 🚀 How It Works
+1. User provides the input CSV file.  
+2. The program reads the data and removes duplicates + blanks.  
+3. The cleaned CSV is saved into a new file (e.g., `cleaned_data.csv`).  
+
+## 📦 Requirements
+- Python 3.x  
+- `pandas` library  
+
+Install dependencies with:
+```bash
+    pip install pandas
