@@ -19,4 +19,5 @@ A lightweight Python utility to quickly clean CSV files by removing **duplicate 
 
 Install dependencies with:
 ```bash
-    pip install pandas
+
+pip install pandas
